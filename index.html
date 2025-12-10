@@ -148,6 +148,7 @@
     </style>
   </head>
   <body>
+    <!-- Overlay "aguarde" -->
     <div id="loadingOverlay" class="overlay hidden">
       <div class="overlay-box">
         <div class="hourglass">⏳</div>
@@ -157,6 +158,7 @@
 
     <div class="card">
       <div class="logo-wrapper">
+        <!-- LOGO PNG CORRETA DO DRIVE -->
         <img
           src="https://drive.google.com/uc?export=view&id=1S6FKpwFKpisk8tFtm4YUB_zXCKJktfRW"
           alt="Perla Andina"
@@ -224,8 +226,9 @@
     </div>
 
     <script>
-      // URL do Web App do Apps Script
-      const BACKEND_URL = "https://script.google.com/macros/s/AKfycbybiKkYDnmVQvezOK0k-TyVf3bhRTyfDwfz_nleK-fXfj5adKW4uehwXytDjbsbV1UkKg/exec";
+      // URL do Web App do Apps Script (sua URL)
+      const BACKEND_URL =
+        "https://script.google.com/macros/s/AKfycbxNFRENfGMtGYdgAydijtoL2d39pq9wJuv2z1dz80sG7vXL2IHZ3LmTBiso5tHbLhO9mw/exec";
 
       function parseFecha(fechaStr) {
         if (!fechaStr) return null;
@@ -253,12 +256,13 @@
       }
 
       document.addEventListener("DOMContentLoaded", function () {
-        const form       = document.getElementById("clienteForm");
+        const form = document.getElementById("clienteForm");
         const fechaInput = document.getElementById("fechaNacimiento");
-        const edadInput  = document.getElementById("edad");
-        const msg        = document.getElementById("msg");
-        const overlay    = document.getElementById("loadingOverlay");
+        const edadInput = document.getElementById("edad");
+        const msg = document.getElementById("msg");
+        const overlay = document.getElementById("loadingOverlay");
 
+        // máscara de data dd/mm/aaaa
         fechaInput.addEventListener("input", function (e) {
           let v = e.target.value;
           v = v.replace(/\D/g, "");
@@ -270,6 +274,7 @@
           e.target.value = v;
         });
 
+        // calcula idade ao sair do campo
         fechaInput.addEventListener("blur", function () {
           const edad = calcularEdadLocal(fechaInput.value.trim());
           edadInput.value = edad || "";
@@ -286,7 +291,7 @@
           }
 
           const fileInput = document.getElementById("fotoDoc");
-          const file      = fileInput.files[0];
+          const file = fileInput.files[0];
 
           overlay.classList.remove("hidden");
 
@@ -299,7 +304,9 @@
             nombreCompleto: document.getElementById("nombreCompleto").value.trim(),
             tipoDoc: document.getElementById("tipoDoc").value,
             numeroDoc: document.getElementById("numeroDoc").value.trim(),
-            fechaNacimientoStr: document.getElementById("fechaNacimiento").value.trim(),
+            fechaNacimientoStr: document
+              .getElementById("fechaNacimiento")
+              .value.trim(),
             nacionalidad: document.getElementById("nacionalidad").value.trim(),
             edadCalculada: Number(edadInput.value) || null
           };
@@ -356,27 +363,21 @@
           if (file) {
             const reader = new FileReader();
             reader.onload = function (ev) {
-              const dataUrl = ev.target.result;
+              const dataUrl = ev.target.result; // data:mime/type;base64,AAAA
               let base64 = "";
               let mimeType = file.type || "image/jpeg";
 
-              if (dataUrl.startsWith("data:")) {
-                const parts = dataUrl.split(",");
-                if (parts.length === 2) {
-                  base64 = parts[1];
-                  const header = parts[0];
-                  const mt = header.split(";)[0]?.split(":")[1];
-                }
-              }
-
-              // Ajuste seguro do mimeType
-              if (dataUrl.startsWith("data:")) {
-                const parts = dataUrl.split(",");
-                if (parts.length === 2) {
-                  base64 = parts[1];
-                  const header = parts[0];
-                  const mt = header.split(";")[0].split(":")[1];
-                  if (mt) mimeType = mt;
+              const commaIndex = dataUrl.indexOf(",");
+              if (commaIndex !== -1) {
+                base64 = dataUrl.substring(commaIndex + 1); // só a parte base64
+                const header = dataUrl.substring(5, commaIndex); // tira "data:"
+                const semicolonIndex = header.indexOf(";");
+                const mimeFromHeader =
+                  semicolonIndex !== -1
+                    ? header.substring(0, semicolonIndex)
+                    : header;
+                if (mimeFromHeader) {
+                  mimeType = mimeFromHeader; // ex: image/jpeg
                 }
               }
 
