@@ -1,0 +1,112 @@
+Perfeito 💥 — agora temos a **especificação completa e profissional** do seu sistema.
+Abaixo está o resumo final (já consolidado), e depois disso eu vou gerar o **ZIP com tudo pronto**.
+
+---
+
+## 🧭 Projeto Final — “Reservas a Prestadores”
+
+### 💡 Objetivo
+
+Criar um **aplicativo web integrado ao Google Sheets**, multilíngue (🇪🇸 / 🇧🇷), que permita:
+
+* Cadastrar e gerenciar **passageiros (titular e acompanhantes)**;
+* Reutilizar dados salvos de passageiros;
+* Gerar automaticamente **mensagens para prestadores**, com preview editável;
+* Enviar via **WhatsApp ou Gmail**, abrindo em nova aba;
+* Salvar automaticamente as reservas na planilha;
+* Mostrar **popup de status (sucesso ou erro)** após cada ação;
+* Operar tanto **fora do Sheets (Web App)** quanto **dentro (sidebar)**.
+
+---
+
+## 📊 Estrutura da Planilha (Reservas_Prestadores_Final.xlsx)
+
+### 🧍‍♂️ Aba `PAXS`
+
+Banco de passageiros reutilizável.
+
+| ID | Tipo | Nome | Fecha Nac | Edad (auto) | Documento | Nacionalidad | Grupo | Notas |
+| -- | ---- | ---- | --------- | ----------- | --------- | ------------ | ----- | ----- |
+
+> 💡 A idade é calculada automaticamente com a fórmula:
+> `=SI(D2="";"";ENTERO((HOY()-D2)/365,25))`
+
+---
+
+### 🗺 Aba `Excursiones (FTE)`
+
+| Código | Nombre del Paseo | Observaciones |
+
+---
+
+### 🧾 Aba `Prestadores`
+
+| Prestador | Email | WhatsApp | Tipo Paseo |
+
+> Ao escolher o prestador no app, o e-mail e WhatsApp são automaticamente exibidos.
+
+---
+
+### 📅 Aba `Reservas`
+
+| Fecha | Paseo | Prestador | Email | WhatsApp | Cant | Hotel | Titular | Acompañantes | Mensaje | Link WhatsApp | Link Email | Status |
+
+> Cada reserva gerada é salva automaticamente com data/hora e links.
+
+---
+
+## 💻 app.html
+
+* Duas abas principais:
+
+  * **📋 PAXS** → capturar/editar passageiros e acompanhantes (até 10).
+  * **✉️ Mensajes** → gerar e enviar mensagens a prestadores.
+* Seletor de idioma 🇪🇸 / 🇧🇷.
+* Campos dinâmicos (seleção de PAX, Prestador, Excursión, etc).
+* Caixa de **pré-visualização da mensagem** (editável antes do envio).
+* Botões:
+
+  * 🔄 Gerar Mensagem
+  * 💬 Enviar por WhatsApp
+  * 📧 Enviar por Email
+  * 💾 Salvar Reserva
+* Popup visual (`alert()` estilizado) para confirmar sucesso/erro da operação.
+
+---
+
+## ⚙️ code.gs
+
+Inclui:
+
+* `doGet()` → gera o app como **Web App externo**.
+* `onOpen()` → adiciona menu lateral dentro do Sheets.
+* `abrirSidebar()` → abre o app como painel.
+* `getData()` → lê PAXs, Prestadores e Excursiones.
+* `guardarPax()` → salva/atualiza passageiro.
+* `buscarPaxs()` → retorna todos os passageiros.
+* `guardarReserva()` → grava reserva e retorna links + status.
+* `generarMensaje()` → monta o corpo da mensagem multilinha.
+* Suporte multilíngue (Espanhol padrão, Português alternativo).
+* Mostra **popup “Reserva guardada correctamente”** ao concluir.
+
+---
+
+## 📦 Entregáveis no ZIP (`reservas_app.zip`)
+
+1. `Reservas_Prestadores_Final.xlsx` — planilha com todas as abas e exemplos.
+2. `app.html` — app multilíngue completo com abas e visual moderno.
+3. `code.gs` — script pronto para implantação (Web App + Sidebar).
+
+---
+
+✅ **Confirmado para gerar agora:**
+
+* Salvamento automático ✅
+* Popup de status ✅
+* Abre WhatsApp e Gmail em nova aba ✅
+* Suporte Web App + Sidebar ✅
+* Idioma padrão: 🇪🇸 Espanhol (com troca dinâmica 🇧🇷 Português) ✅
+
+---
+
+
