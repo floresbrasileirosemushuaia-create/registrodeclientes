@@ -117,7 +117,6 @@
         color: #f97373;
       }
 
-      /* Overlay de carregamento */
       .overlay {
         position: fixed;
         inset: 0;
@@ -149,7 +148,6 @@
     </style>
   </head>
   <body>
-    <!-- Overlay de carregamento -->
     <div id="loadingOverlay" class="overlay hidden">
       <div class="overlay-box">
         <div class="hourglass">⏳</div>
@@ -159,7 +157,6 @@
 
     <div class="card">
       <div class="logo-wrapper">
-        <!-- Logo Perla Andina (PNG do Drive) -->
         <img
           src="https://drive.google.com/uc?export=view&id=1S6FKpwFKpisk8tFtm4YUB_zXCKJktfRW"
           alt="Perla Andina"
@@ -227,9 +224,8 @@
     </div>
 
     <script>
-      // URL do backend (Apps Script WebApp, API, etc.)
-      // Se deixar vazio, o envio será apenas simulado.
-      const BACKEND_URL = "";
+      // URL do Web App do Apps Script
+      const BACKEND_URL = "https://script.google.com/macros/s/AKfycbybiKkYDnmVQvezOK0k-TyVf3bhRTyfDwfz_nleK-fXfj5adKW4uehwXytDjbsbV1UkKg/exec";
 
       function parseFecha(fechaStr) {
         if (!fechaStr) return null;
@@ -257,16 +253,15 @@
       }
 
       document.addEventListener("DOMContentLoaded", function () {
-        const form = document.getElementById("clienteForm");
+        const form       = document.getElementById("clienteForm");
         const fechaInput = document.getElementById("fechaNacimiento");
-        const edadInput = document.getElementById("edad");
-        const msg = document.getElementById("msg");
-        const overlay = document.getElementById("loadingOverlay");
+        const edadInput  = document.getElementById("edad");
+        const msg        = document.getElementById("msg");
+        const overlay    = document.getElementById("loadingOverlay");
 
-        // Auto-inserir "/" em dd/mm/aaaa
         fechaInput.addEventListener("input", function (e) {
           let v = e.target.value;
-          v = v.replace(/\D/g, ""); // só dígitos
+          v = v.replace(/\D/g, "");
           if (v.length >= 3 && v.length <= 4) {
             v = v.slice(0, 2) + "/" + v.slice(2);
           } else if (v.length > 4) {
@@ -275,7 +270,6 @@
           e.target.value = v;
         });
 
-        // Calcular idade ao sair do campo
         fechaInput.addEventListener("blur", function () {
           const edad = calcularEdadLocal(fechaInput.value.trim());
           edadInput.value = edad || "";
@@ -286,104 +280,124 @@
           msg.textContent = "";
           msg.className = "msg";
 
-          // Garante idade calculada na hora do envio
           const edadCalc = calcularEdadLocal(fechaInput.value.trim());
           if (edadCalc) {
             edadInput.value = edadCalc;
           }
 
           const fileInput = document.getElementById("fotoDoc");
-          const file = fileInput.files[0];
+          const file      = fileInput.files[0];
 
-          // Mostrar overlay (ampulheta)
           overlay.classList.remove("hidden");
 
           function finalizarLoading() {
             overlay.classList.add("hidden");
           }
 
-          const payload = {
+          const baseData = {
             numeroReserva: document.getElementById("numeroReserva").value.trim(),
-            nombreCompleto: document
-              .getElementById("nombreCompleto")
-              .value.trim(),
+            nombreCompleto: document.getElementById("nombreCompleto").value.trim(),
             tipoDoc: document.getElementById("tipoDoc").value,
             numeroDoc: document.getElementById("numeroDoc").value.trim(),
-            fechaNacimientoStr: document
-              .getElementById("fechaNacimiento")
-              .value.trim(),
+            fechaNacimientoStr: document.getElementById("fechaNacimiento").value.trim(),
             nacionalidad: document.getElementById("nacionalidad").value.trim(),
             edadCalculada: Number(edadInput.value) || null
           };
 
-          // Se não houver backend configurado, apenas simula
-          if (!BACKEND_URL) {
-            console.log("Dados preparados para envio:", payload);
-            if (file) {
-              console.log("Arquivo selecionado:", {
-                name: file.name,
-                type: file.type,
-                size: file.size
-              });
-            }
-            setTimeout(function () {
-              finalizarLoading();
-              msg.textContent = "Simulación de envío exitosa (BACKEND_URL vacío).";
-              msg.classList.add("ok");
-              alert("El envío fue exitoso (simulado).");
-              form.reset();
-              edadInput.value = "";
-            }, 1200);
-            return;
-          }
-
-          // Backend real via fetch + FormData
-          const formData = new FormData();
-          formData.append("data", JSON.stringify(payload));
-          if (file) {
-            formData.append("fotoDoc", file);
-          }
-
-          fetch(BACKEND_URL, {
-            method: "POST",
-            body: formData
-          })
-            .then(async (response) => {
-              const text = await response.text();
-              let res;
-              try {
-                res = JSON.parse(text);
-              } catch (e) {
-                res = { success: response.ok, raw: text };
-              }
-              finalizarLoading();
-              if (res && res.success) {
-                msg.textContent =
-                  res.message || "Registro guardado correctamente.";
-                msg.classList.add("ok");
-                alert("El envío fue exitoso.");
-                form.reset();
-                edadInput.value = "";
-              } else {
-                msg.textContent =
-                  "No se pudo guardar el cliente. " +
-                  (res && res.raw ? "Detalle: " + res.raw : "");
-                msg.classList.add("error");
-                alert("Hubo un problema al guardar los datos.");
-              }
+          function sendPayload(payload) {
+            fetch(BACKEND_URL, {
+              method: "POST",
+              headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+              },
+              body: JSON.stringify(payload)
             })
-            .catch((err) => {
-              finalizarLoading();
-              console.error(err);
-              msg.textContent =
-                "Error al guardar los datos: " +
-                (err && err.message ? err.message : err);
-              msg.classList.add("error");
-              alert("Error al guardar los datos.");
-            });
+              .then((response) =>
+                response.text().then((text) => ({ ok: response.ok, text }))
+              )
+              .then(({ ok, text }) => {
+                finalizarLoading();
+                let res;
+                try {
+                  res = JSON.parse(text);
+                } catch (e) {
+                  res = { success: ok, message: "Respuesta no válida", raw: text };
+                }
+
+                if (res && res.success) {
+                  msg.textContent =
+                    res.message || "Registro guardado correctamente.";
+                  msg.classList.add("ok");
+                  if (res.edad) {
+                    edadInput.value = res.edad;
+                  }
+                  alert("El envío fue exitoso.");
+                  form.reset();
+                  edadInput.value = "";
+                } else {
+                  msg.textContent =
+                    "No se pudo guardar el cliente. " +
+                    (res && res.message ? "Detalle: " + res.message : "");
+                  msg.classList.add("error");
+                  alert("Hubo un problema al guardar los datos.");
+                }
+              })
+              .catch((err) => {
+                finalizarLoading();
+                console.error(err);
+                msg.textContent =
+                  "Error al guardar los datos: " +
+                  (err && err.message ? err.message : err);
+                msg.classList.add("error");
+                alert("Error al guardar los datos.");
+              });
+          }
+
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+              const dataUrl = ev.target.result;
+              let base64 = "";
+              let mimeType = file.type || "image/jpeg";
+
+              if (dataUrl.startsWith("data:")) {
+                const parts = dataUrl.split(",");
+                if (parts.length === 2) {
+                  base64 = parts[1];
+                  const header = parts[0];
+                  const mt = header.split(";)[0]?.split(":")[1];
+                }
+              }
+
+              // Ajuste seguro do mimeType
+              if (dataUrl.startsWith("data:")) {
+                const parts = dataUrl.split(",");
+                if (parts.length === 2) {
+                  base64 = parts[1];
+                  const header = parts[0];
+                  const mt = header.split(";")[0].split(":")[1];
+                  if (mt) mimeType = mt;
+                }
+              }
+
+              const payload = {
+                data: baseData,
+                file: {
+                  filename: file.name,
+                  mimeType: mimeType,
+                  base64: base64
+                }
+              };
+
+              sendPayload(payload);
+            };
+            reader.readAsDataURL(file);
+          } else {
+            const payload = { data: baseData };
+            sendPayload(payload);
+          }
         });
       });
     </script>
   </body>
 </html>
-
