@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Registro de clientes – Perla Andina</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #0f172a;
+        color: #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+
+      .card {
+        background: #020617;
+        border-radius: 16px;
+        padding: 24px 20px 20px;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.8);
+        width: 100%;
+        max-width: 480px;
+        border: 1px solid #1e293b;
+      }
+
+      .logo-wrapper {
+        text-align: center;
+        margin-bottom: 16px;
+      }
+
+      .logo-wrapper img {
+        max-width: 220px;
+        width: 100%;
+        height: auto;
+        display: inline-block;
+      }
+
+      h1 {
+        font-size: 1.1rem;
+        text-align: center;
+        margin: 0 0 16px;
+        color: #f9fafb;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      label {
+        font-size: 0.85rem;
+        color: #cbd5f5;
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid #1f2937;
+        background: #020617;
+        color: #e5e7eb;
+        font-size: 0.9rem;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+      }
+
+      input[readonly] {
+        background: #020617;
+        color: #9ca3af;
+      }
+
+      button {
+        margin-top: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        border: none;
+        background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+        color: #0b1120;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        width: 100%;
+      }
+
+      button:hover {
+        opacity: 0.95;
+      }
+
+      .msg {
+        margin-top: 10px;
+        font-size: 0.85rem;
+        min-height: 1.2em;
+      }
+
+      .msg.ok {
+        color: #22c55e;
+      }
+
+      .msg.error {
+        color: #f97373;
+      }
+
+      /* Overlay de carregamento */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+      }
+
+      .overlay-box {
+        background: #020617;
+        border-radius: 12px;
+        padding: 16px 20px;
+        border: 1px solid #38bdf8;
+        text-align: center;
+        font-size: 0.95rem;
+        min-width: 220px;
+      }
+
+      .hourglass {
+        font-size: 2rem;
+        margin-bottom: 6px;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Overlay de carregamento -->
+    <div id="loadingOverlay" class="overlay hidden">
+      <div class="overlay-box">
+        <div class="hourglass">⏳</div>
+        <div>Guardando datos, por favor espere...</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="logo-wrapper">
+        <!-- Logo Perla Andina (PNG do Drive) -->
+        <img
+          src="https://drive.google.com/uc?export=view&id=1S6FKpwFKpisk8tFtm4YUB_zXCKJktfRW"
+          alt="Perla Andina"
+        />
+      </div>
+
+      <h1>Registro de clientes</h1>
+
+      <form id="clienteForm">
+        <div>
+          <label for="numeroReserva">Número de reserva</label>
+          <input type="text" id="numeroReserva" />
+        </div>
+
+        <div>
+          <label for="nombreCompleto">Nombre completo</label>
+          <input type="text" id="nombreCompleto" required />
+        </div>
+
+        <div>
+          <label for="tipoDoc">Tipo de documento</label>
+          <select id="tipoDoc" required>
+            <option value="">Seleccione una opción</option>
+            <option value="DNI">DNI</option>
+            <option value="PASAPORTE">Pasaporte</option>
+            <option value="IDENTIDAD_EXTRANJERA">Identidad extranjera</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="numeroDoc">Número de documento</label>
+          <input type="text" id="numeroDoc" required />
+        </div>
+
+        <div>
+          <label for="fechaNacimiento">Fecha de nacimiento (dd/mm/aaaa)</label>
+          <input
+            type="text"
+            id="fechaNacimiento"
+            placeholder="dd/mm/aaaa"
+            maxlength="10"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="nacionalidad">Nacionalidad</label>
+          <input type="text" id="nacionalidad" required />
+        </div>
+
+        <div>
+          <label for="edad">Edad (automático)</label>
+          <input type="number" id="edad" readonly />
+        </div>
+
+        <div>
+          <label for="fotoDoc">Foto del documento (opcional)</label>
+          <input type="file" id="fotoDoc" accept="image/*" />
+        </div>
+
+        <button type="submit">Guardar cliente</button>
+
+        <div id="msg" class="msg"></div>
+      </form>
+    </div>
+
+    <script>
+      // URL do backend (Apps Script WebApp, API, etc.)
+      // Se deixar vazio, o envio será apenas simulado.
+      const BACKEND_URL = "";
+
+      function parseFecha(fechaStr) {
+        if (!fechaStr) return null;
+        const partes = fechaStr.split("/");
+        if (partes.length !== 3) return null;
+        const d = parseInt(partes[0], 10);
+        const m = parseInt(partes[1], 10);
+        const y = parseInt(partes[2], 10);
+        if (!d || !m || !y) return null;
+        const fecha = new Date(y, m - 1, d);
+        if (isNaN(fecha.getTime())) return null;
+        return fecha;
+      }
+
+      function calcularEdadLocal(fechaStr) {
+        const fecha = parseFecha(fechaStr);
+        if (!fecha) return "";
+        const hoy = new Date();
+        let edad = hoy.getFullYear() - fecha.getFullYear();
+        const mes = hoy.getMonth() - fecha.getMonth();
+        if (mes < 0 || (mes === 0 && hoy.getDate() < fecha.getDate())) {
+          edad--;
+        }
+        return edad;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("clienteForm");
+        const fechaInput = document.getElementById("fechaNacimiento");
+        const edadInput = document.getElementById("edad");
+        const msg = document.getElementById("msg");
+        const overlay = document.getElementById("loadingOverlay");
+
+        // Auto-inserir "/" em dd/mm/aaaa
+        fechaInput.addEventListener("input", function (e) {
+          let v = e.target.value;
+          v = v.replace(/\D/g, ""); // só dígitos
+          if (v.length >= 3 && v.length <= 4) {
+            v = v.slice(0, 2) + "/" + v.slice(2);
+          } else if (v.length > 4) {
+            v = v.slice(0, 2) + "/" + v.slice(2, 4) + "/" + v.slice(4, 8);
+          }
+          e.target.value = v;
+        });
+
+        // Calcular idade ao sair do campo
+        fechaInput.addEventListener("blur", function () {
+          const edad = calcularEdadLocal(fechaInput.value.trim());
+          edadInput.value = edad || "";
+        });
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          msg.textContent = "";
+          msg.className = "msg";
+
+          // Garante idade calculada na hora do envio
+          const edadCalc = calcularEdadLocal(fechaInput.value.trim());
+          if (edadCalc) {
+            edadInput.value = edadCalc;
+          }
+
+          const fileInput = document.getElementById("fotoDoc");
+          const file = fileInput.files[0];
+
+          // Mostrar overlay (ampulheta)
+          overlay.classList.remove("hidden");
+
+          function finalizarLoading() {
+            overlay.classList.add("hidden");
+          }
+
+          const payload = {
+            numeroReserva: document.getElementById("numeroReserva").value.trim(),
+            nombreCompleto: document
+              .getElementById("nombreCompleto")
+              .value.trim(),
+            tipoDoc: document.getElementById("tipoDoc").value,
+            numeroDoc: document.getElementById("numeroDoc").value.trim(),
+            fechaNacimientoStr: document
+              .getElementById("fechaNacimiento")
+              .value.trim(),
+            nacionalidad: document.getElementById("nacionalidad").value.trim(),
+            edadCalculada: Number(edadInput.value) || null
+          };
+
+          // Se não houver backend configurado, apenas simula
+          if (!BACKEND_URL) {
+            console.log("Dados preparados para envio:", payload);
+            if (file) {
+              console.log("Arquivo selecionado:", {
+                name: file.name,
+                type: file.type,
+                size: file.size
+              });
+            }
+            setTimeout(function () {
+              finalizarLoading();
+              msg.textContent = "Simulación de envío exitosa (BACKEND_URL vacío).";
+              msg.classList.add("ok");
+              alert("El envío fue exitoso (simulado).");
+              form.reset();
+              edadInput.value = "";
+            }, 1200);
+            return;
+          }
+
+          // Backend real via fetch + FormData
+          const formData = new FormData();
+          formData.append("data", JSON.stringify(payload));
+          if (file) {
+            formData.append("fotoDoc", file);
+          }
+
+          fetch(BACKEND_URL, {
+            method: "POST",
+            body: formData
+          })
+            .then(async (response) => {
+              const text = await response.text();
+              let res;
+              try {
+                res = JSON.parse(text);
+              } catch (e) {
+                res = { success: response.ok, raw: text };
+              }
+              finalizarLoading();
+              if (res && res.success) {
+                msg.textContent =
+                  res.message || "Registro guardado correctamente.";
+                msg.classList.add("ok");
+                alert("El envío fue exitoso.");
+                form.reset();
+                edadInput.value = "";
+              } else {
+                msg.textContent =
+                  "No se pudo guardar el cliente. " +
+                  (res && res.raw ? "Detalle: " + res.raw : "");
+                msg.classList.add("error");
+                alert("Hubo un problema al guardar los datos.");
+              }
+            })
+            .catch((err) => {
+              finalizarLoading();
+              console.error(err);
+              msg.textContent =
+                "Error al guardar los datos: " +
+                (err && err.message ? err.message : err);
+              msg.classList.add("error");
+              alert("Error al guardar los datos.");
+            });
+        });
+      });
+    </script>
+  </body>
+</html>
+
