@@ -6,9 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <style>
-      *, *::before, *::after {
-        box-sizing: border-box;
-      }
+      *, *::before, *::after { box-sizing: border-box; }
 
       body {
         margin: 0;
@@ -31,17 +29,8 @@
         border: 1px solid #1e293b;
       }
 
-      .logo-wrapper {
-        text-align: center;
-        margin-bottom: 16px;
-      }
-
-      .logo-wrapper img {
-        max-width: 220px;
-        width: 100%;
-        height: auto;
-        display: inline-block;
-      }
+      .logo-wrapper { text-align: center; margin-bottom: 16px; }
+      .logo-wrapper img { max-width: 220px; width: 100%; height: auto; display: inline-block; }
 
       h1 {
         font-size: 1.1rem;
@@ -50,11 +39,7 @@
         color: #f9fafb;
       }
 
-      form {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-      }
+      form { display: flex; flex-direction: column; gap: 12px; }
 
       label {
         font-size: 0.85rem;
@@ -63,8 +48,7 @@
         margin-bottom: 4px;
       }
 
-      input,
-      select {
+      input, select {
         width: 100%;
         padding: 8px 10px;
         border-radius: 8px;
@@ -74,17 +58,13 @@
         font-size: 0.9rem;
       }
 
-      input:focus,
-      select:focus {
+      input:focus, select:focus {
         outline: none;
         border-color: #38bdf8;
         box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
       }
 
-      input[readonly] {
-        background: #020617;
-        color: #9ca3af;
-      }
+      input[readonly] { background: #020617; color: #9ca3af; }
 
       button {
         margin-top: 8px;
@@ -98,24 +78,11 @@
         cursor: pointer;
         width: 100%;
       }
+      button:hover { opacity: 0.95; }
 
-      button:hover {
-        opacity: 0.95;
-      }
-
-      .msg {
-        margin-top: 10px;
-        font-size: 0.85rem;
-        min-height: 1.2em;
-      }
-
-      .msg.ok {
-        color: #22c55e;
-      }
-
-      .msg.error {
-        color: #f97373;
-      }
+      .msg { margin-top: 10px; font-size: 0.85rem; min-height: 1.2em; }
+      .msg.ok { color: #22c55e; }
+      .msg.error { color: #f97373; }
 
       .overlay {
         position: fixed;
@@ -137,16 +104,18 @@
         min-width: 220px;
       }
 
-      .hourglass {
-        font-size: 2rem;
-        margin-bottom: 6px;
-      }
+      .hourglass { font-size: 2rem; margin-bottom: 6px; }
+      .hidden { display: none !important; }
 
-      .hidden {
-        display: none !important;
+      /* NOVO: layout simples p/ WhatsApp (2 campos) */
+      .two-cols {
+        display: flex;
+        gap: 10px;
       }
+      .two-cols input:first-child { max-width: 110px; }
     </style>
   </head>
+
   <body>
     <!-- Overlay "aguarde" -->
     <div id="loadingOverlay" class="overlay hidden">
@@ -158,7 +127,6 @@
 
     <div class="card">
       <div class="logo-wrapper">
-        <!-- LOGO PNG CORRETA DO DRIVE -->
         <img
           src="https://drive.google.com/uc?export=view&id=1S6FKpwFKpisk8tFtm4YUB_zXCKJktfRW"
           alt="Perla Andina"
@@ -167,21 +135,25 @@
 
       <h1>Registro de clientes</h1>
 
-      <div>
+      <form id="clienteForm">
+        <div>
+          <label for="numeroReserva">Número de reserva</label>
+          <input type="text" id="numeroReserva" />
+        </div>
+
+        <!-- NOVO -->
+        <div>
           <label for="hotel">Hotel</label>
-          <input type="text" id="Hotel" required />
+          <input type="text" id="hotel" />
         </div>
-      
-      <form id="clienteForm">
+
+        <!-- NOVO -->
         <div>
-          <label for="numeroReserva">Número de Whatsapp</label>
-          <input type="text" id="numeroReserva" />
-        </div>
-        
-      <form id="clienteForm">
-        <div>
-          <label for="numeroReserva">Número de Whatsapp</label>
-          <input type="text" id="numeroReserva" />
+          <label>WhatsApp (cód país + número)</label>
+          <div class="two-cols">
+            <input type="text" id="whatsappPais" placeholder="+54" maxlength="6" inputmode="tel" />
+            <input type="text" id="whatsappNumero" placeholder="2901..." maxlength="20" inputmode="tel" />
+          </div>
         </div>
 
         <div>
@@ -237,7 +209,6 @@
     </div>
 
     <script>
-      // URL do Web App do Apps Script (sua URL)
       const BACKEND_URL =
         "https://script.google.com/macros/s/AKfycbxNFRENfGMtGYdgAydijtoL2d39pq9wJuv2z1dz80sG7vXL2IHZ3LmTBiso5tHbLhO9mw/exec";
 
@@ -273,7 +244,6 @@
         const msg = document.getElementById("msg");
         const overlay = document.getElementById("loadingOverlay");
 
-        // máscara de data dd/mm/aaaa
         fechaInput.addEventListener("input", function (e) {
           let v = e.target.value;
           v = v.replace(/\D/g, "");
@@ -285,7 +255,6 @@
           e.target.value = v;
         });
 
-        // calcula idade ao sair do campo
         fechaInput.addEventListener("blur", function () {
           const edad = calcularEdadLocal(fechaInput.value.trim());
           edadInput.value = edad || "";
@@ -297,27 +266,26 @@
           msg.className = "msg";
 
           const edadCalc = calcularEdadLocal(fechaInput.value.trim());
-          if (edadCalc) {
-            edadInput.value = edadCalc;
-          }
+          if (edadCalc) edadInput.value = edadCalc;
 
           const fileInput = document.getElementById("fotoDoc");
           const file = fileInput.files[0];
 
           overlay.classList.remove("hidden");
-
-          function finalizarLoading() {
-            overlay.classList.add("hidden");
-          }
+          function finalizarLoading() { overlay.classList.add("hidden"); }
 
           const baseData = {
             numeroReserva: document.getElementById("numeroReserva").value.trim(),
+
+            // NOVO
+            hotel: document.getElementById("hotel").value.trim(),
+            whatsappPais: document.getElementById("whatsappPais").value.trim(),
+            whatsappNumero: document.getElementById("whatsappNumero").value.trim(),
+
             nombreCompleto: document.getElementById("nombreCompleto").value.trim(),
             tipoDoc: document.getElementById("tipoDoc").value,
             numeroDoc: document.getElementById("numeroDoc").value.trim(),
-            fechaNacimientoStr: document
-              .getElementById("fechaNacimiento")
-              .value.trim(),
+            fechaNacimientoStr: document.getElementById("fechaNacimiento").value.trim(),
             nacionalidad: document.getElementById("nacionalidad").value.trim(),
             edadCalculada: Number(edadInput.value) || null
           };
@@ -325,9 +293,7 @@
           function sendPayload(payload) {
             fetch(BACKEND_URL, {
               method: "POST",
-              headers: {
-                "Content-Type": "text/plain;charset=utf-8"
-              },
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
               body: JSON.stringify(payload)
             })
               .then((response) =>
@@ -336,19 +302,13 @@
               .then(({ ok, text }) => {
                 finalizarLoading();
                 let res;
-                try {
-                  res = JSON.parse(text);
-                } catch (e) {
-                  res = { success: ok, message: "Respuesta no válida", raw: text };
-                }
+                try { res = JSON.parse(text); }
+                catch (e) { res = { success: ok, message: "Respuesta no válida", raw: text }; }
 
                 if (res && res.success) {
-                  msg.textContent =
-                    res.message || "Registro guardado correctamente.";
+                  msg.textContent = res.message || "Registro guardado correctamente.";
                   msg.classList.add("ok");
-                  if (res.edad) {
-                    edadInput.value = res.edad;
-                  }
+                  if (res.edad) edadInput.value = res.edad;
                   alert("El envío fue exitoso.");
                   form.reset();
                   edadInput.value = "";
@@ -374,44 +334,33 @@
           if (file) {
             const reader = new FileReader();
             reader.onload = function (ev) {
-              const dataUrl = ev.target.result; // data:mime/type;base64,AAAA
+              const dataUrl = ev.target.result;
               let base64 = "";
               let mimeType = file.type || "image/jpeg";
 
               const commaIndex = dataUrl.indexOf(",");
               if (commaIndex !== -1) {
-                base64 = dataUrl.substring(commaIndex + 1); // só a parte base64
-                const header = dataUrl.substring(5, commaIndex); // tira "data:"
+                base64 = dataUrl.substring(commaIndex + 1);
+                const header = dataUrl.substring(5, commaIndex);
                 const semicolonIndex = header.indexOf(";");
                 const mimeFromHeader =
-                  semicolonIndex !== -1
-                    ? header.substring(0, semicolonIndex)
-                    : header;
-                if (mimeFromHeader) {
-                  mimeType = mimeFromHeader; // ex: image/jpeg
-                }
+                  semicolonIndex !== -1 ? header.substring(0, semicolonIndex) : header;
+                if (mimeFromHeader) mimeType = mimeFromHeader;
               }
 
               const payload = {
                 data: baseData,
-                file: {
-                  filename: file.name,
-                  mimeType: mimeType,
-                  base64: base64
-                }
+                file: { filename: file.name, mimeType: mimeType, base64: base64 }
               };
 
               sendPayload(payload);
             };
             reader.readAsDataURL(file);
           } else {
-            const payload = { data: baseData };
-            sendPayload(payload);
+            sendPayload({ data: baseData });
           }
         });
       });
     </script>
   </body>
 </html>
-
-
